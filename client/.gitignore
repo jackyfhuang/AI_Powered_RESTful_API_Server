@@ -12,7 +12,6 @@ node_modules
 dist
 dist-ssr
 *.local
-.env
 
 # Environment files (keep templates)
 .env
