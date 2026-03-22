@@ -10,6 +10,9 @@ build/
 .env
 .env.*
 
+# Database
+*.db
+
 # Logs
 logs/
 *.log
@@ -25,3 +28,4 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .gitignore
+.claude
