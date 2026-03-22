@@ -1,42 +1,115 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.app-shell {
+  width: min(980px, 92vw);
+  margin: 2rem auto;
+  display: grid;
+  gap: 1rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.panel {
+  background: #ffffff;
+  border: 1px solid #d7dbe0;
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  text-align: left;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.header-panel h1 {
+  margin: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.muted {
+  margin: 0.5rem 0 0;
+  color: #5f6b7a;
 }
 
-.card {
-  padding: 2em;
+.small-note {
+  font-size: 0.9rem;
 }
 
-.read-the-docs {
-  color: #888;
+.form-grid {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+}
+
+.form-grid label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.form-grid input {
+  border: 1px solid #c5cbd3;
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+}
+
+.dev-preview-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.panel-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.panel-title-row h2 {
+  margin: 0;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.stat-box {
+  border: 1px solid #d7dbe0;
+  border-radius: 10px;
+  padding: 0.8rem;
+}
+
+.stat-box h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.stat-box p {
+  margin: 0.5rem 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.8rem;
+}
+
+th,
+td {
+  border: 1px solid #d7dbe0;
+  padding: 0.6rem;
+}
+
+th {
+  background: #f5f7fa;
+  text-align: left;
+}
+
+.error-text {
+  color: #a42323;
+  margin: 0;
 }
