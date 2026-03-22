@@ -5,9 +5,6 @@ const apiBase =
   import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "http://localhost:3001";
 const TOKEN_KEY = "classroom_api_token";
 
-// allow UI-only preview of dashboards before auth backend is ready.
-const isAuthBypassEnabled = import.meta.env.VITE_DEV_BYPASS_AUTH === "true";
-
 type UserRole = "user" | "admin";
 
 type CurrentUser = {
@@ -23,42 +20,6 @@ type UsageRow = {
   role: UserRole;
   apiCallsUsed: number;
 };
-
-const mockUsers: Record<UserRole, CurrentUser> = {
-  user: {
-    id: 101,
-    email: "john@john.com",
-    role: "user",
-    apiCallsUsed: 4,
-  },
-  admin: {
-    id: 1,
-    email: "admin@admin.com",
-    role: "admin",
-    apiCallsUsed: 0,
-  },
-};
-
-const mockUsageRows: UsageRow[] = [
-  {
-    id: 1,
-    email: "admin@admin.com",
-    role: "admin",
-    apiCallsUsed: 0,
-  },
-  {
-    id: 101,
-    email: "john@john.com",
-    role: "user",
-    apiCallsUsed: 4,
-  },
-  {
-    id: 102,
-    email: "sarah@school.com",
-    role: "user",
-    apiCallsUsed: 12,
-  },
-];
 
 function App() {
   // auth/session, role-specific user data, and admin usage list.
@@ -97,10 +58,6 @@ function App() {
 
   // Resolve current user from token so UI can route to user/admin landing dashboard.
   useEffect(() => {
-    if (isAuthBypassEnabled) {
-      return;
-    }
-
     if (!token) {
       setCurrentUser(null);
       return;
@@ -111,15 +68,6 @@ function App() {
 
   // Admin-only table data source.
   useEffect(() => {
-    if (isAuthBypassEnabled) {
-      if (currentUser?.role === "admin") {
-        setUsageRows(mockUsageRows);
-      } else {
-        setUsageRows([]);
-      }
-      return;
-    }
-
     if (!token || currentUser?.role !== "admin") {
       setUsageRows([]);
       return;
@@ -227,18 +175,6 @@ function App() {
     }
   }
 
-  // Dev-only preview helper to test dashboards without backend auth.
-  function enterPreview(role: UserRole) {
-    const mockUser = mockUsers[role];
-    const previewToken = `dev-bypass-${role}`;
-
-    localStorage.setItem(TOKEN_KEY, previewToken);
-    setToken(previewToken);
-    setCurrentUser(mockUser);
-    setUsageRows(role === "admin" ? mockUsageRows : []);
-    setMessage("");
-  }
-
   // Shared sign-out/reset helper.
   function clearSession() {
     localStorage.removeItem(TOKEN_KEY);
@@ -283,24 +219,9 @@ function App() {
             </label>
             <button type="submit">Sign in</button>
           </form>
-          {isAuthBypassEnabled && (
-            <div className="dev-preview-actions">
-              <button type="button" onClick={() => enterPreview("user")}>
-                Preview User Dashboard
-              </button>
-              <button type="button" onClick={() => enterPreview("admin")}>
-                Preview Admin Dashboard
-              </button>
-            </div>
-          )}
           <p className="muted small-note">
             This UI expects: POST /auth/login, GET /auth/me, GET /admin/usage.
           </p>
-          {isAuthBypassEnabled && (
-            <p className="muted small-note">
-              Dev auth bypass is ON (VITE_DEV_BYPASS_AUTH=true).
-            </p>
-          )}
         </section>
       )}
 
@@ -345,7 +266,7 @@ function App() {
               <button
                 type="button"
                 onClick={() => token && loadAdminUsage(token)}
-                disabled={loadingUsage || isAuthBypassEnabled}
+                disabled={loadingUsage}
               >
                 {loadingUsage ? "Refreshing..." : "Refresh usage"}
               </button>
