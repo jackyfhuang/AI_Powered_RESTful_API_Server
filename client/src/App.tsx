@@ -4,6 +4,8 @@ import "./App.css";
 const apiBase =
   import.meta.env.VITE_API_URL?.replace(/\/$/, "") ?? "http://localhost:3001";
 const TOKEN_KEY = "classroom_api_token";
+
+// allow UI-only preview of dashboards before auth backend is ready.
 const isAuthBypassEnabled = import.meta.env.VITE_DEV_BYPASS_AUTH === "true";
 
 type UserRole = "user" | "admin";
@@ -59,6 +61,7 @@ const mockUsageRows: UsageRow[] = [
 ];
 
 function App() {
+  // auth/session, role-specific user data, and admin usage list.
   const [apiStatus, setApiStatus] = useState<"checking" | "ok" | "error">(
     "checking"
   );
@@ -73,6 +76,7 @@ function App() {
   const [loadingUsage, setLoadingUsage] = useState(false);
   const [message, setMessage] = useState("");
 
+  // each user has 20 free API calls.
   const callsRemaining = useMemo(() => {
     if (!currentUser || currentUser.role !== "user") {
       return null;
@@ -91,6 +95,7 @@ function App() {
       .catch(() => setApiStatus("error"));
   }, []);
 
+  // Resolve current user from token so UI can route to user/admin landing dashboard.
   useEffect(() => {
     if (isAuthBypassEnabled) {
       return;
@@ -104,6 +109,7 @@ function App() {
     void loadCurrentUser(token);
   }, [token]);
 
+  // Admin-only table data source.
   useEffect(() => {
     if (isAuthBypassEnabled) {
       if (currentUser?.role === "admin") {
@@ -122,6 +128,7 @@ function App() {
     void loadAdminUsage(token);
   }, [token, currentUser?.role]);
 
+  // GET /auth/me: fetch signed-in profile and role.
   async function loadCurrentUser(authToken: string) {
     setLoadingUser(true);
     setMessage("");
@@ -153,6 +160,7 @@ function App() {
     }
   }
 
+  // GET /admin/usage: populate admin usage monitoring table.
   async function loadAdminUsage(authToken: string) {
     setLoadingUsage(true);
     setMessage("");
@@ -180,6 +188,7 @@ function App() {
     }
   }
 
+  // POST /auth/login: obtain token and initial user data for role-based landing page.
   async function onLoginSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
@@ -218,6 +227,7 @@ function App() {
     }
   }
 
+  // Dev-only preview helper to test dashboards without backend auth.
   function enterPreview(role: UserRole) {
     const mockUser = mockUsers[role];
     const previewToken = `dev-bypass-${role}`;
@@ -229,6 +239,7 @@ function App() {
     setMessage("");
   }
 
+  // Shared sign-out/reset helper.
   function clearSession() {
     localStorage.removeItem(TOKEN_KEY);
     setToken(null);
@@ -300,6 +311,7 @@ function App() {
       )}
 
       {token && currentUser?.role === "user" && (
+        // User landing page.
         <section className="panel user-panel">
           <div className="panel-title-row">
             <h2>User Dashboard</h2>
@@ -325,6 +337,7 @@ function App() {
       )}
 
       {token && currentUser?.role === "admin" && (
+        // Admin landing page with usage monitoring table.
         <section className="panel admin-panel">
           <div className="panel-title-row">
             <h2>Admin Dashboard</h2>
@@ -384,6 +397,7 @@ function App() {
   );
 }
 
+// Accepts either { token } or returns null for invalid payloads.
 function readToken(body: unknown): string | null {
   if (!body || typeof body !== "object") {
     return null;
@@ -393,6 +407,7 @@ function readToken(body: unknown): string | null {
   return typeof token === "string" && token.length > 0 ? token : null;
 }
 
+// Normalizes backend payloads: { user: {...} } or direct user object.
 function mapCurrentUser(body: unknown): CurrentUser | null {
   if (!body || typeof body !== "object") {
     return null;
@@ -425,6 +440,7 @@ function mapCurrentUser(body: unknown): CurrentUser | null {
   };
 }
 
+// Normalizes admin usage payloads: array or { users: array }.
 function mapUsageRows(body: unknown): UsageRow[] {
   const dataSource = Array.isArray(body)
     ? body
