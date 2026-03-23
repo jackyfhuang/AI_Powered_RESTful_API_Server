@@ -11,7 +11,7 @@ function seed() {
     "INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)"
   );
 
-  insert.run("admin@admin.com", bcrypt.hashSync("111", SALT_ROUNDS), "admin");
+  insert", bcrypt.hashSync("111", SALT_ROUNDS), "admin");
   insert.run("john@john.com", bcrypt.hashSync("123", SALT_ROUNDS), "student");
 
   console.log("Seeded test users: admin@admin.com (admin) and john@john.com (student)");
