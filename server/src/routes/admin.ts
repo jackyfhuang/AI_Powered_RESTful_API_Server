@@ -4,6 +4,42 @@ import { requireAuth, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
+function toClientRole(role: string): "user" | "admin" {
+  return role === "admin" ? "admin" : "user";
+}
+
+function toClientUser(user: {
+  id: number;
+  email: string;
+  role: string;
+  api_calls_used?: number;
+}) {
+  return {
+    id: user.id,
+    email: user.email,
+    role: toClientRole(user.role),
+    apiCallsUsed: user.api_calls_used ?? 0,
+  };
+}
+
+/** GET /admin/usage — Day 3 admin usage table contract */
+router.get(
+  "/usage",
+  requireAuth,
+  requireRole("admin"),
+  (_req, res) => {
+    const rows = db
+      .prepare(
+        `SELECT id, email, role, api_calls_used
+         FROM users
+         ORDER BY id ASC`
+      )
+      .all() as Array<{ id: number; email: string; role: string; api_calls_used: number }>;
+
+    res.json({ users: rows.map(toClientUser) });
+  }
+);
+
 /** GET /admin/users — list all users with API usage */
 router.get(
   "/users",
